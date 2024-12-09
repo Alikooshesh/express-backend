@@ -4,6 +4,14 @@
     "description": "API for managing records with user-specific access",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string",
+      "description": "Base URL for the API"
+    }
+  ],
   "item": [
     {
       "name": "Create Record",
@@ -23,10 +31,8 @@
           }
         ],
         "url": {
-          "raw": "http://localhost:3000/api/records",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
+          "raw": "{{baseUrl}}/api/records",
+          "host": ["{{baseUrl}}"],
           "path": ["api", "records"]
         },
         "body": {
@@ -49,10 +55,8 @@
           }
         ],
         "url": {
-          "raw": "http://localhost:3000/api/records?page=1&limit=10&sortBy=age&order=desc&filterKey=status&filterValue=active&filterValue=pending",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
+          "raw": "{{baseUrl}}/api/records?page=1&limit=10&sortBy=age&order=desc&filterKey=status&filterValue=active&filterValue=pending",
+          "host": ["{{baseUrl}}"],
           "path": ["api", "records"],
           "query": [
             {
@@ -108,10 +112,8 @@
           }
         ],
         "url": {
-          "raw": "http://localhost:3000/api/records/:id",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
+          "raw": "{{baseUrl}}/api/records/:id",
+          "host": ["{{baseUrl}}"],
           "path": ["api", "records", ":id"],
           "variable": [
             {
@@ -142,10 +144,8 @@
           }
         ],
         "url": {
-          "raw": "http://localhost:3000/api/records/:id",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
+          "raw": "{{baseUrl}}/api/records/:id",
+          "host": ["{{baseUrl}}"],
           "path": ["api", "records", ":id"],
           "variable": [
             {
@@ -175,10 +175,8 @@
           }
         ],
         "url": {
-          "raw": "http://localhost:3000/api/records/:id",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
+          "raw": "{{baseUrl}}/api/records/:id",
+          "host": ["{{baseUrl}}"],
           "path": ["api", "records", ":id"],
           "variable": [
             {
@@ -204,10 +202,8 @@
           }
         ],
         "url": {
-          "raw": "http://localhost:3000/api/records",
-          "protocol": "http",
-          "host": ["localhost"],
-          "port": "3000",
+          "raw": "{{baseUrl}}/api/records",
+          "host": ["{{baseUrl}}"],
           "path": ["api", "records"]
         },
         "description": "Delete all records for the authenticated user"
