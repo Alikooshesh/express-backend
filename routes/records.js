@@ -8,10 +8,16 @@ router.post('/', requireApiKey, async (req, res) => {
   try {
     const newRecord = new Record({
       ...req.body,
-      user_key: req.api_key
+      id: await Record.countDocuments() + 1,
+      user_key: req.api_key,
+      createdAt: new Date()
     });
     const savedRecord = await newRecord.save();
-    res.status(201).json(savedRecord);
+    const response = savedRecord.toObject();
+    delete response.__v;
+    delete response.user_key;
+    delete response._id;
+    res.status(201).json(response);
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -77,8 +83,15 @@ router.get('/', requireApiKey, async (req, res) => {
       Record.countDocuments(query)
     ]);
 
+    const formattedRecords = records.map(record => {
+      const obj = record.toObject();
+      delete obj.__v;
+      delete obj.user_key;
+      return obj;
+    });
+
     res.json({
-      records,
+      records: formattedRecords,
       totalRecords: total,
       currentPage: Number(page),
       totalPages: Math.ceil(total / limit),
@@ -99,12 +112,16 @@ router.get('/', requireApiKey, async (req, res) => {
 router.get('/:id', requireApiKey, async (req, res) => {
   try {
     const record = await Record.findOne({
-      _id: req.params.id,
+      id: Number(req.params.id),  // Convert to number since IDs are timestamps
       user_key: req.api_key
     });
 
     if (record) {
-      res.json(record);
+      const response = record.toObject();
+      delete response.__v;
+      delete response.user_key;
+      delete response._id;
+      res.json(response);
     } else {
       res.status(404).json({ message: 'Record not found or unauthorized' });
     }
@@ -118,7 +135,7 @@ router.put('/:id', requireApiKey, async (req, res) => {
   try {
     const updatedRecord = await Record.findOneAndUpdate(
       {
-        _id: req.params.id,
+        id: Number(req.params.id),
         user_key: req.api_key
       },
       req.body,
@@ -126,7 +143,11 @@ router.put('/:id', requireApiKey, async (req, res) => {
     );
 
     if (updatedRecord) {
-      res.json(updatedRecord);
+      const response = updatedRecord.toObject();
+      delete response.__v;
+      delete response.user_key;
+      delete response._id;
+      res.json(response);
     } else {
       res.status(404).json({ message: 'Record not found or unauthorized' });
     }
@@ -139,7 +160,7 @@ router.put('/:id', requireApiKey, async (req, res) => {
 router.delete('/:id', requireApiKey, async (req, res) => {
   try {
     const deletedRecord = await Record.findOneAndDelete({
-      _id: req.params.id,
+      id: Number(req.params.id),
       user_key: req.api_key
     });
 

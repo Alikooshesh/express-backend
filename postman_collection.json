@@ -55,7 +55,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/records?page=1&limit=10&sortBy=age&order=desc&filterKey=status&filterValue=active&filterValue=pending",
+          "raw": "{{baseUrl}}/api/records?page=1&limit=10&sortBy=age&order=desc&filterKey=status&filterValue=active&filterValue=pending&filterKey=createdAt&filterMin=2024-01-01&filterMax=2024-12-31",
           "host": ["{{baseUrl}}"],
           "path": ["api", "records"],
           "query": [
@@ -93,10 +93,25 @@
               "key": "filterValue",
               "value": "pending",
               "description": "Additional filter value"
+            },
+            {
+              "key": "filterKey",
+              "value": "createdAt",
+              "description": "Additional field to filter by"
+            },
+            {
+              "key": "filterMin",
+              "value": "2024-01-01",
+              "description": "Minimum date for date range filter"
+            },
+            {
+              "key": "filterMax",
+              "value": "2024-12-31",
+              "description": "Maximum date for date range filter"
             }
           ]
         },
-        "description": "Get all records with pagination, sorting, and filtering options"
+        "description": "Get all records with pagination, sorting, and filtering options including date range filtering"
       }
     },
     {
