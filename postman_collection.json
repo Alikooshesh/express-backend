@@ -31,9 +31,9 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/records",
+          "raw": "{{baseUrl}}/api/records/users",
           "host": ["{{baseUrl}}"],
-          "path": ["api", "records"]
+          "path": ["api", "records", "users"]
         },
         "body": {
           "mode": "raw",
@@ -55,9 +55,9 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/records?page=1&limit=10&sortBy=age&order=desc&filterKey=status&filterValue=active&filterValue=pending&filterKey=createdAt&filterMin=2024-01-01&filterMax=2024-12-31",
+          "raw": "{{baseUrl}}/api/records/users?page=1&limit=10&sortBy=age&order=desc&filterKey=status&filterValue=active&filterValue=pending&filterKey=createdAt&filterMin=2024-01-01&filterMax=2024-12-31",
           "host": ["{{baseUrl}}"],
-          "path": ["api", "records"],
+          "path": ["api", "records", "users"],
           "query": [
             {
               "key": "page",
@@ -127,9 +127,9 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/records/:id",
+          "raw": "{{baseUrl}}/api/records/users/:id",
           "host": ["{{baseUrl}}"],
-          "path": ["api", "records", ":id"],
+          "path": ["api", "records", "users", ":id"],
           "variable": [
             {
               "key": "id",
@@ -159,9 +159,9 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/records/:id",
+          "raw": "{{baseUrl}}/api/records/users/:id",
           "host": ["{{baseUrl}}"],
-          "path": ["api", "records", ":id"],
+          "path": ["api", "records", "users", ":id"],
           "variable": [
             {
               "key": "id",
@@ -190,9 +190,9 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/records/:id",
+          "raw": "{{baseUrl}}/api/records/users/:id",
           "host": ["{{baseUrl}}"],
-          "path": ["api", "records", ":id"],
+          "path": ["api", "records", "users", ":id"],
           "variable": [
             {
               "key": "id",
@@ -217,11 +217,60 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/records/delete-all",
+          "raw": "{{baseUrl}}/api/records/users/delete-all",
           "host": ["{{baseUrl}}"],
-          "path": ["api", "records"]
+          "path": ["api", "records", "users", "delete-all"]
         },
         "description": "Delete all records for the authenticated user"
+      }
+    },
+    {
+      "name": "Export All Records",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "api_key",
+            "value": "your-api-key",
+            "type": "text",
+            "required": true
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/records/users/export",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "records", "users", "export"]
+        },
+        "description": "Export all records for the authenticated user"
+      }
+    },
+    {
+      "name": "Import Records",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "api_key",
+            "value": "your-api-key",
+            "type": "text",
+            "required": true
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json",
+            "type": "text"
+          }
+        ],
+        "url": {
+          "raw": "{{baseUrl}}/api/records/users/import",
+          "host": ["{{baseUrl}}"],
+          "path": ["api", "records", "users", "import"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "[\n    {\n        \"name\": \"Imported Record 1\",\n        \"age\": 30\n    },\n    {\n        \"name\": \"Imported Record 2\",\n        \"age\": 28\n    }\n]"
+        },
+        "description": "Import an array of records for the authenticated user"
       }
     }
   ]
