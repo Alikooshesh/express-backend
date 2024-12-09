@@ -7,6 +7,8 @@ const formatRecord = (obj) => {
   delete obj._id;
   delete obj.__v;
   delete obj.user_key;
+  obj.id = obj.data_id;
+  delete obj.data_id;
   return obj;
 };
 
@@ -30,7 +32,7 @@ router.post('/', requireApiKey, async (req, res) => {
   try {
     const newRecord = new Record({
       ...req.body,
-      id: Date.now() * (Math.floor(Math.random() * 1000) + 1),
+      data_id: Date.now() * (Math.floor(Math.random() * 1000) + 1),
       user_key: req.api_key,
       createdAt: new Date()
     });
@@ -131,7 +133,7 @@ router.get('/', requireApiKey, async (req, res) => {
 router.get('/:id', requireApiKey, async (req, res) => {
   try {
     const record = await Record.findOne({
-      id: Number(req.params.id),  // Convert to number since IDs are timestamps
+      data_id: Number(req.params.id),  // Convert to number since IDs are timestamps
       user_key: req.api_key
     });
 
@@ -150,7 +152,7 @@ router.put('/:id', requireApiKey, async (req, res) => {
   try {
     const updatedRecord = await Record.findOneAndUpdate(
       {
-        id: Number(req.params.id),
+        data_id: Number(req.params.id),
         user_key: req.api_key
       },
       req.body,
@@ -171,7 +173,7 @@ router.put('/:id', requireApiKey, async (req, res) => {
 router.delete('/:id', requireApiKey, async (req, res) => {
   try {
     const deletedRecord = await Record.findOneAndDelete({
-      id: Number(req.params.id),
+      data_id: Number(req.params.id),
       user_key: req.api_key
     });
 
@@ -186,7 +188,7 @@ router.delete('/:id', requireApiKey, async (req, res) => {
 });
 
 // DELETE ALL - Delete all records for a specific user
-router.delete('/', requireApiKey, async (req, res) => {
+router.delete('/delete-all', requireApiKey, async (req, res) => {
   try {
     const result = await Record.deleteMany({ user_key: req.api_key });
 

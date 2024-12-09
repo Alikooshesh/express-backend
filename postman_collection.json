@@ -217,7 +217,7 @@
           }
         ],
         "url": {
-          "raw": "{{baseUrl}}/api/records",
+          "raw": "{{baseUrl}}/api/records/delete-all",
           "host": ["{{baseUrl}}"],
           "path": ["api", "records"]
         },
