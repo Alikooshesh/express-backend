@@ -8,7 +8,7 @@ router.post('/', requireApiKey, async (req, res) => {
   try {
     const newRecord = new Record({
       ...req.body,
-      id: await Record.countDocuments() + 1,
+      id: Date.now() * (Math.floor(Math.random() * 1000) + 1),
       user_key: req.api_key,
       createdAt: new Date()
     });
@@ -29,8 +29,8 @@ router.get('/', requireApiKey, async (req, res) => {
     const { 
       sortBy, 
       order, 
-      page = 1, 
-      limit = 10,
+      page, 
+      limit,
       filterKey,
       filterMin,
       filterMax 
@@ -75,8 +75,10 @@ router.get('/', requireApiKey, async (req, res) => {
       findQuery = findQuery.sort({ [sortBy]: sortOrder });
     }
 
-    const skip = (page - 1) * limit;
-    findQuery = findQuery.skip(skip).limit(Number(limit));
+    if (limit) {
+      const skip = ((page || 1) - 1) * limit;
+      findQuery = findQuery.skip(skip).limit(Number(limit));
+    }
 
     const [records, total] = await Promise.all([
       findQuery,
@@ -85,6 +87,7 @@ router.get('/', requireApiKey, async (req, res) => {
 
     const formattedRecords = records.map(record => {
       const obj = record.toObject();
+      delete obj._id;
       delete obj.__v;
       delete obj.user_key;
       return obj;
@@ -93,9 +96,15 @@ router.get('/', requireApiKey, async (req, res) => {
     res.json({
       records: formattedRecords,
       totalRecords: total,
-      currentPage: Number(page),
-      totalPages: Math.ceil(total / limit),
-      recordsPerPage: Number(limit),
+      ...(!limit ? {
+        currentPage: 1,
+        totalPages: 1,
+        recordsPerPage: Infinity,
+      } : {
+        currentPage: Number(page || 1),
+        totalPages: Math.ceil(total / Number(limit)),
+        recordsPerPage: Number(limit)
+      }),
       appliedFilters: filterKey ? {
         filterKey,
         filterValue: Array.isArray(filterValue) ? filterValue : [filterValue],
