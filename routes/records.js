@@ -7,6 +7,7 @@ const formatRecord = (obj) => {
   delete obj._id;
   delete obj.__v;
   delete obj.user_key;
+  delete obj.user_custom_category;
   obj.id = obj.data_id;
   delete obj.data_id;
   return obj;
@@ -27,13 +28,15 @@ const formatResponse = (req, res, next) => {
 
 router.use(formatResponse);
 
-// CREATE - Post a new record
-router.post('/', requireApiKey, async (req, res) => {
+// CREATE - Post a new record with optional category
+router.post('/:category?', requireApiKey, async (req, res) => {
   try {
+    const category = req.params.category || 'global'; // Default to "global"
     const newRecord = new Record({
       ...req.body,
       data_id: Date.now() * (Math.floor(Math.random() * 1000) + 1),
       user_key: req.api_key,
+      user_custom_category: category,
       createdAt: new Date()
     });
     const savedRecord = await newRecord.save();
@@ -43,9 +46,10 @@ router.post('/', requireApiKey, async (req, res) => {
   }
 });
 
-// READ - Get all records with sorting, filtering and pagination
-router.get('/', requireApiKey, async (req, res) => {
+// READ - Get all records with sorting, filtering, pagination, and optional category
+router.get('/:category?', requireApiKey, async (req, res) => {
   try {
+    const category = req.params.category || 'global'; // Default to "global"
     const { 
       sortBy, 
       order, 
@@ -58,7 +62,10 @@ router.get('/', requireApiKey, async (req, res) => {
 
     const filterValue = req.query.filterValue;
     
-    let query = { user_key: req.api_key };
+    let query = { 
+      user_key: req.api_key,
+      user_custom_category: category
+    };
 
     if (filterKey) {
       if (filterMin !== undefined || filterMax !== undefined) {
@@ -129,12 +136,14 @@ router.get('/', requireApiKey, async (req, res) => {
   }
 });
 
-// READ - Get a single record by ID
-router.get('/:id', requireApiKey, async (req, res) => {
+// READ - Get a single record by ID with optional category
+router.get('/:category/:id', requireApiKey, async (req, res) => {
   try {
+    const category = req.params.category || 'global'; // Default to "global"
     const record = await Record.findOne({
-      data_id: Number(req.params.id),  // Convert to number since IDs are timestamps
-      user_key: req.api_key
+      data_id: Number(req.params.id),
+      user_key: req.api_key,
+      user_custom_category: category
     });
 
     if (record) {
@@ -147,13 +156,15 @@ router.get('/:id', requireApiKey, async (req, res) => {
   }
 });
 
-// UPDATE - Update a record by ID
-router.put('/:id', requireApiKey, async (req, res) => {
+// UPDATE - Update a record by ID with optional category
+router.put('/:category/:id', requireApiKey, async (req, res) => {
   try {
+    const category = req.params.category || 'global'; // Default to "global"
     const updatedRecord = await Record.findOneAndUpdate(
       {
         data_id: Number(req.params.id),
-        user_key: req.api_key
+        user_key: req.api_key,
+        user_custom_category: category
       },
       req.body,
       { new: true }
@@ -169,12 +180,40 @@ router.put('/:id', requireApiKey, async (req, res) => {
   }
 });
 
-// DELETE - Delete a record by ID
-router.delete('/:id', requireApiKey, async (req, res) => {
+
+// DELETE ALL - Delete all records for a specific user with optional category
+router.delete('/:category/delete-all', requireApiKey, async (req, res) => {
+    try {
+      const category = req.params.category || 'global'; // Default to "global"
+      const result = await Record.deleteMany({ 
+        user_key: req.api_key,
+        user_custom_category: category
+      });
+  
+      if (result.deletedCount > 0) {
+        res.json({ 
+          message: 'Records deleted successfully', 
+          deletedCount: result.deletedCount 
+        });
+      } else {
+        res.status(404).json({ 
+          message: 'No records found for this user',
+          deletedCount: 0
+        });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
+
+// DELETE - Delete a record by ID with optional category
+router.delete('/:category/:id', requireApiKey, async (req, res) => {
   try {
+    const category = req.params.category || 'global'; // Default to "global"
     const deletedRecord = await Record.findOneAndDelete({
       data_id: Number(req.params.id),
-      user_key: req.api_key
+      user_key: req.api_key,
+      user_custom_category: category
     });
 
     if (deletedRecord) {
@@ -187,25 +226,5 @@ router.delete('/:id', requireApiKey, async (req, res) => {
   }
 });
 
-// DELETE ALL - Delete all records for a specific user
-router.delete('/delete-all', requireApiKey, async (req, res) => {
-  try {
-    const result = await Record.deleteMany({ user_key: req.api_key });
-
-    if (result.deletedCount > 0) {
-      res.json({ 
-        message: 'Records deleted successfully', 
-        deletedCount: result.deletedCount 
-      });
-    } else {
-      res.status(404).json({ 
-        message: 'No records found for this user',
-        deletedCount: 0
-      });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
 
 module.exports = router; 
