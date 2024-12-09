@@ -3,6 +3,28 @@ const router = express.Router();
 const Record = require('../models/Record');
 const requireApiKey = require('../middleware/auth');
 
+const formatRecord = (obj) => {
+  delete obj._id;
+  delete obj.__v;
+  delete obj.user_key;
+  return obj;
+};
+
+const formatResponse = (req, res, next) => {
+  const originalJson = res.json;
+  res.json = function(data) {
+    if (data && data.records) {
+      data.records = data.records.map(formatRecord);
+    } else if (data && !data.message) {
+      formatRecord(data);
+    }
+    return originalJson.call(this, data);
+  };
+  next();
+};
+
+router.use(formatResponse);
+
 // CREATE - Post a new record
 router.post('/', requireApiKey, async (req, res) => {
   try {
@@ -13,11 +35,7 @@ router.post('/', requireApiKey, async (req, res) => {
       createdAt: new Date()
     });
     const savedRecord = await newRecord.save();
-    const response = savedRecord.toObject();
-    delete response.__v;
-    delete response.user_key;
-    delete response._id;
-    res.status(201).json(response);
+    res.status(201).json(savedRecord.toObject());
   } catch (error) {
     res.status(400).json({ message: error.message });
   }
@@ -85,25 +103,17 @@ router.get('/', requireApiKey, async (req, res) => {
       Record.countDocuments(query)
     ]);
 
-    const formattedRecords = records.map(record => {
-      const obj = record.toObject();
-      delete obj._id;
-      delete obj.__v;
-      delete obj.user_key;
-      return obj;
-    });
-
     res.json({
-      records: formattedRecords,
+      records: records.map(r => r.toObject()),
       totalRecords: total,
-      ...(!limit ? {
+      ...(limit ? {
+        currentPage: Number(page || 1),
+        totalPages: Math.ceil(total / Number(limit)),
+        recordsPerPage: Number(limit),
+      } : {
         currentPage: 1,
         totalPages: 1,
         recordsPerPage: Infinity,
-      } : {
-        currentPage: Number(page || 1),
-        totalPages: Math.ceil(total / Number(limit)),
-        recordsPerPage: Number(limit)
       }),
       appliedFilters: filterKey ? {
         filterKey,
@@ -126,11 +136,7 @@ router.get('/:id', requireApiKey, async (req, res) => {
     });
 
     if (record) {
-      const response = record.toObject();
-      delete response.__v;
-      delete response.user_key;
-      delete response._id;
-      res.json(response);
+      res.json(record.toObject());
     } else {
       res.status(404).json({ message: 'Record not found or unauthorized' });
     }
@@ -152,11 +158,7 @@ router.put('/:id', requireApiKey, async (req, res) => {
     );
 
     if (updatedRecord) {
-      const response = updatedRecord.toObject();
-      delete response.__v;
-      delete response.user_key;
-      delete response._id;
-      res.json(response);
+      res.json(updatedRecord.toObject());
     } else {
       res.status(404).json({ message: 'Record not found or unauthorized' });
     }
