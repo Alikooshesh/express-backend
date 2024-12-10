@@ -6,7 +6,7 @@ const requireApiKey = require('../middleware/auth');
 const formatRecord = (obj) => {
   delete obj._id;
   delete obj.__v;
-  delete obj.user_key;
+  delete obj.application_key;
   delete obj.user_custom_category;
   obj.id = obj.data_id;
   delete obj.data_id;
@@ -35,7 +35,7 @@ router.post('/:category?', requireApiKey, async (req, res) => {
     const newRecord = new Record({
       ...req.body,
       data_id: Date.now() * (Math.floor(Math.random() * 1000) + 1),
-      user_key: req.api_key,
+      application_key: req.api_key,
       user_custom_category: category,
       createdAt: new Date()
     });
@@ -63,7 +63,7 @@ router.get('/:category?', requireApiKey, async (req, res) => {
     const filterValue = req.query.filterValue;
     
     let query = { 
-      user_key: req.api_key,
+      application_key: req.api_key,
       user_custom_category: category
     };
 
@@ -142,7 +142,7 @@ router.get('/:category/:id', requireApiKey, async (req, res) => {
     const category = req.params.category || 'global'; // Default to "global"
     const record = await Record.findOne({
       data_id: Number(req.params.id),
-      user_key: req.api_key,
+      application_key: req.api_key,
       user_custom_category: category
     });
 
@@ -163,7 +163,7 @@ router.put('/:category/:id', requireApiKey, async (req, res) => {
     const updatedRecord = await Record.findOneAndUpdate(
       {
         data_id: Number(req.params.id),
-        user_key: req.api_key,
+        application_key: req.api_key,
         user_custom_category: category
       },
       req.body,
@@ -186,7 +186,7 @@ router.delete('/:category/delete-all', requireApiKey, async (req, res) => {
     try {
       const category = req.params.category || 'global'; // Default to "global"
       const result = await Record.deleteMany({ 
-        user_key: req.api_key,
+        application_key: req.api_key,
         user_custom_category: category
       });
   
@@ -212,7 +212,7 @@ router.delete('/:category/:id', requireApiKey, async (req, res) => {
     const category = req.params.category || 'global'; // Default to "global"
     const deletedRecord = await Record.findOneAndDelete({
       data_id: Number(req.params.id),
-      user_key: req.api_key,
+      application_key: req.api_key,
       user_custom_category: category
     });
 
@@ -229,7 +229,7 @@ router.delete('/:category/:id', requireApiKey, async (req, res) => {
 // EXPORT - Export all records for a user
 router.get('/export', requireApiKey, async (req, res) => {
   try {
-    const records = await Record.find({ user_key: req.api_key });
+    const records = await Record.find({ application_key: req.api_key });
     
     if (records.length === 0) {
       return res.status(404).json({ message: 'No records found to export' });
@@ -240,7 +240,7 @@ router.get('/export', requireApiKey, async (req, res) => {
       // Remove sensitive/internal fields but keep user_custom_category
       delete obj._id;
       delete obj.__v;
-      delete obj.user_key;
+      delete obj.application_key;
       obj.id = obj.data_id;
       delete obj.data_id;
       return obj;
@@ -273,7 +273,7 @@ router.post('/import', requireApiKey, async (req, res) => {
         const newRecord = new Record({
           ...record,
           data_id: record.id,  // Convert back from id to data_id
-          user_key: req.api_key,
+          application_key: req.api_key,
           createdAt: new Date()
         });
         delete newRecord.id;  // Remove the temporary id field

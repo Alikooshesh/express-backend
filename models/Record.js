@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const recordSchema = new mongoose.Schema({
-  user_key: {
+  application_key: {
     type: String,
     required: true,
     index: true
