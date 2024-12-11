@@ -6,6 +6,14 @@ const recordSchema = new mongoose.Schema({
     required: true,
     index: true
   },
+  data_id: {
+    type: String,
+    required: true,
+  },
+  type: {
+    type: String,
+    required: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now

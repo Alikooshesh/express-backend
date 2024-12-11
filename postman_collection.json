@@ -14,264 +14,483 @@
   ],
   "item": [
     {
-      "name": "Create Record",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "api_key",
-            "value": "your-api-key",
-            "type": "text",
-            "required": true
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
+      "name": "User APIs",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "your-api-key",
+                "type": "text",
+                "required": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/register",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "register"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@example.com\",\n    \"phone\": \"1234567890\",\n    \"password\": \"password123\"\n}"
+            },
+            "description": "Register a new user"
           }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/api/records/users",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "records", "users"]
         },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"name\": \"Test Record\",\n    \"age\": 25,\n    \"isActive\": true\n}"
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "your-api-key",
+                "type": "text",
+                "required": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "login"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"test@example.com\",\n    \"password\": \"password123\"\n}"
+            },
+            "description": "Login a user"
+          }
         },
-        "description": "Create a new record with the provided data"
-      }
+        {
+          "name": "Get User Data",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "your-api-key",
+                "type": "text",
+                "required": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "me"]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "your-access-token",
+                  "type": "text"
+                }
+              ]
+            },
+            "description": "Fetch user data"
+          }
+        },
+        {
+          "name": "Update User Data",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "your-api-key",
+                "type": "text",
+                "required": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/users/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "users", "me"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"phone\": \"0987654321\"\n}"
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "your-access-token",
+                  "type": "text"
+                }
+              ]
+            },
+            "description": "Update user data"
+          }
+        }
+      ]
     },
     {
-      "name": "Get All Records",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "api_key",
-            "value": "your-api-key",
-            "type": "text",
-            "required": true
+      "name": "Admin APIs",
+      "item": [
+        {
+          "name": "Create User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "your-api-key",
+                "type": "text",
+                "required": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "users"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"email\": \"admin@example.com\",\n    \"phone\": \"1234567890\",\n    \"password\": \"adminpassword\"\n}"
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "your-access-token",
+                  "type": "text"
+                }
+              ]
+            },
+            "description": "Create a new user as admin"
           }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/api/records/users?page=1&limit=10&sortBy=age&order=desc&filterKey=status&filterValue=active&filterValue=pending&filterKey=createdAt&filterMin=2024-01-01&filterMax=2024-12-31",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "records", "users"],
-          "query": [
-            {
-              "key": "page",
-              "value": "1",
-              "description": "Page number for pagination"
-            },
-            {
-              "key": "limit",
-              "value": "10",
-              "description": "Number of records per page"
-            },
-            {
-              "key": "sortBy",
-              "value": "age",
-              "description": "Field to sort by"
-            },
-            {
-              "key": "order",
-              "value": "desc",
-              "description": "Sort order (asc or desc)"
-            },
-            {
-              "key": "filterKey",
-              "value": "status",
-              "description": "Field to filter by"
-            },
-            {
-              "key": "filterValue",
-              "value": "active",
-              "description": "Filter value (can be multiple)"
-            },
-            {
-              "key": "filterValue",
-              "value": "pending",
-              "description": "Additional filter value"
-            },
-            {
-              "key": "filterKey",
-              "value": "createdAt",
-              "description": "Additional field to filter by"
-            },
-            {
-              "key": "filterMin",
-              "value": "2024-01-01",
-              "description": "Minimum date for date range filter"
-            },
-            {
-              "key": "filterMax",
-              "value": "2024-12-31",
-              "description": "Maximum date for date range filter"
-            }
-          ]
         },
-        "description": "Get all records with pagination, sorting, and filtering options including date range filtering"
-      }
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "your-api-key",
+                "type": "text",
+                "required": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "users"]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "your-access-token",
+                  "type": "text"
+                }
+              ]
+            },
+            "description": "Get all users"
+          }
+        },
+        {
+          "name": "Update User Role",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "your-api-key",
+                "type": "text",
+                "required": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/admin/users/:id/role",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "admin", "users", ":id", "role"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "description": "Change a user's role to admin"
+          }
+        }
+      ]
     },
     {
-      "name": "Get Record by ID",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "api_key",
-            "value": "your-api-key",
-            "type": "text",
-            "required": true
+      "name": "Records APIs",
+      "item": [
+        {
+          "name": "Create Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "your-api-key",
+                "type": "text",
+                "required": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/records/users",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "records", "users"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Test Record\",\n    \"age\": 25,\n    \"isActive\": true\n}"
+            },
+            "description": "Create a new record with the provided data"
           }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/api/records/users/:id",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "records", "users", ":id"],
-          "variable": [
-            {
-              "key": "id",
-              "value": "record-id-here",
-              "description": "Record ID"
-            }
-          ]
         },
-        "description": "Get a specific record by ID"
-      }
-    },
-    {
-      "name": "Update Record",
-      "request": {
-        "method": "PUT",
-        "header": [
-          {
-            "key": "api_key",
-            "value": "your-api-key",
-            "type": "text",
-            "required": true
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
+        {
+          "name": "Get All Records",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "your-api-key",
+                "type": "text",
+                "required": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/records/users?page=1&limit=10&sortBy=age&order=desc&filterKey=status&filterValue=active&filterValue=pending&filterKey=createdAt&filterMin=2024-01-01&filterMax=2024-12-31",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "records", "users"],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "Page number for pagination"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "Number of records per page"
+                },
+                {
+                  "key": "sortBy",
+                  "value": "age",
+                  "description": "Field to sort by"
+                },
+                {
+                  "key": "order",
+                  "value": "desc",
+                  "description": "Sort order (asc or desc)"
+                },
+                {
+                  "key": "filterKey",
+                  "value": "status",
+                  "description": "Field to filter by"
+                },
+                {
+                  "key": "filterValue",
+                  "value": "active",
+                  "description": "Filter value (can be multiple)"
+                },
+                {
+                  "key": "filterValue",
+                  "value": "pending",
+                  "description": "Additional filter value"
+                },
+                {
+                  "key": "filterKey",
+                  "value": "createdAt",
+                  "description": "Additional field to filter by"
+                },
+                {
+                  "key": "filterMin",
+                  "value": "2024-01-01",
+                  "description": "Minimum date for date range filter"
+                },
+                {
+                  "key": "filterMax",
+                  "value": "2024-12-31",
+                  "description": "Maximum date for date range filter"
+                }
+              ]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "your-access-token",
+                  "type": "text"
+                }
+              ]
+            },
+            "description": "Get all records with pagination, sorting, and filtering options including date range filtering"
           }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/api/records/users/:id",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "records", "users", ":id"],
-          "variable": [
-            {
-              "key": "id",
-              "value": "record-id-here",
-              "description": "Record ID"
-            }
-          ]
         },
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"name\": \"Updated Record\",\n    \"age\": 26\n}"
-        },
-        "description": "Update a specific record by ID"
-      }
-    },
-    {
-      "name": "Delete Record",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "api_key",
-            "value": "your-api-key",
-            "type": "text",
-            "required": true
+        {
+          "name": "Get Record by ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "your-api-key",
+                "type": "text",
+                "required": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/records/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "records", "users", ":id"]
+            },
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "your-access-token",
+                  "type": "text"
+                }
+              ]
+            },
+            "description": "Get a specific record by ID"
           }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/api/records/users/:id",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "records", "users", ":id"],
-          "variable": [
-            {
-              "key": "id",
-              "value": "record-id-here",
-              "description": "Record ID"
-            }
-          ]
         },
-        "description": "Delete a specific record by ID"
-      }
-    },
-    {
-      "name": "Delete All Records",
-      "request": {
-        "method": "DELETE",
-        "header": [
-          {
-            "key": "api_key",
-            "value": "your-api-key",
-            "type": "text",
-            "required": true
+        {
+          "name": "Update Record",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "your-api-key",
+                "type": "text",
+                "required": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/records/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "records", "users", ":id"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n    \"name\": \"Updated Record\",\n    \"age\": 26\n}"
+            },
+            "description": "Update a specific record by ID"
           }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/api/records/users/delete-all",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "records", "users", "delete-all"]
         },
-        "description": "Delete all records for the authenticated user"
-      }
-    },
-    {
-      "name": "Export All Records",
-      "request": {
-        "method": "GET",
-        "header": [
-          {
-            "key": "api_key",
-            "value": "your-api-key",
-            "type": "text",
-            "required": true
+        {
+          "name": "Delete Record",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "your-api-key",
+                "type": "text",
+                "required": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/records/users/:id",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "records", "users", ":id"]
+            },
+            "description": "Delete a specific record by ID"
           }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/api/records/users/export",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "records", "users", "export"]
         },
-        "description": "Export all records for the authenticated user"
-      }
-    },
-    {
-      "name": "Import Records",
-      "request": {
-        "method": "POST",
-        "header": [
-          {
-            "key": "api_key",
-            "value": "your-api-key",
-            "type": "text",
-            "required": true
-          },
-          {
-            "key": "Content-Type",
-            "value": "application/json",
-            "type": "text"
+        {
+          "name": "Delete All Records",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "your-api-key",
+                "type": "text",
+                "required": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/records/users/delete-all",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "records", "users", "delete-all"]
+            },
+            "description": "Delete all records for the authenticated user"
           }
-        ],
-        "url": {
-          "raw": "{{baseUrl}}/api/records/users/import",
-          "host": ["{{baseUrl}}"],
-          "path": ["api", "records", "users", "import"]
         },
-        "body": {
-          "mode": "raw",
-          "raw": "[\n    {\n        \"name\": \"Imported Record 1\",\n        \"age\": 30\n    },\n    {\n        \"name\": \"Imported Record 2\",\n        \"age\": 28\n    }\n]"
+        {
+          "name": "Export All Records",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "your-api-key",
+                "type": "text",
+                "required": true
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/records/users/export",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "records", "users", "export"]
+            },
+            "description": "Export all records for the authenticated user"
+          }
         },
-        "description": "Import an array of records for the authenticated user"
-      }
+        {
+          "name": "Import Records",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "api_key",
+                "value": "your-api-key",
+                "type": "text",
+                "required": true
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/records/users/import",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "records", "users", "import"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "[\n    {\n        \"name\": \"Imported Record 1\",\n        \"age\": 30\n    },\n    {\n        \"name\": \"Imported Record 2\",\n        \"age\": 28\n    }\n]"
+            },
+            "description": "Import an array of records for the authenticated user"
+          }
+        }
+      ]
     }
   ]
 } 

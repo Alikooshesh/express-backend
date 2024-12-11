@@ -2,6 +2,7 @@ const express = require('express');
 require('dotenv').config();
 const connectDB = require('./config/db');
 const recordsRouter = require('./routes/records');
+const usersRouter = require('./routes/users');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -12,6 +13,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/records', recordsRouter);
+app.use('/api/users', usersRouter);
 
 // Error handling middleware (must be after routes)
 app.use(errorHandler);

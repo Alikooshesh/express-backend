@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Record = require('../models/Record');
-const requireApiKey = require('../middleware/auth');
+const {requireApiKey} = require('../middleware/auth');
 
 const formatRecord = (obj) => {
   delete obj._id;
@@ -37,7 +37,8 @@ router.post('/:category?', requireApiKey, async (req, res) => {
       data_id: Date.now() * (Math.floor(Math.random() * 1000) + 1),
       application_key: req.api_key,
       user_custom_category: category,
-      createdAt: new Date()
+      createdAt: new Date(),
+      type: "record"
     });
     const savedRecord = await newRecord.save();
     res.status(201).json(savedRecord.toObject());
