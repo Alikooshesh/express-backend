@@ -3,17 +3,23 @@ require('dotenv').config();
 const connectDB = require('./config/db');
 const recordsRouter = require('./routes/records');
 const usersRouter = require('./routes/users');
+const filesRouter = require('./routes/files');
 const errorHandler = require('./middleware/errorHandler');
+const path = require('path');
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(express.json());
+// Serve static files from the 'assets/uploads' directory
+app.use('/assets/uploads', express.static(path.join(__dirname, 'assets/uploads')));
 
 // Routes
 app.use('/api/records', recordsRouter);
 app.use('/api/users', usersRouter);
+app.use('/api/files', filesRouter);
 
 // Error handling middleware (must be after routes)
 app.use(errorHandler);
