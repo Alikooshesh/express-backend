@@ -8,6 +8,7 @@ const formatRecord = (obj) => {
   delete obj.__v;
   delete obj.application_key;
   delete obj.user_custom_category;
+  delete obj.type;
   obj.id = obj.data_id;
   delete obj.data_id;
   return obj;
