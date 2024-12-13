@@ -6,12 +6,13 @@ const usersRouter = require('./routes/users');
 const filesRouter = require('./routes/files');
 const errorHandler = require('./middleware/errorHandler');
 const path = require('path');
-
+const cors = require('cors');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
+app.use(cors()); // Allow all origins
 app.use(express.json());
 // Serve static files from the 'assets/uploads' directory
 app.use('/assets/uploads', express.static(path.join(__dirname, 'assets/uploads')));
@@ -28,7 +29,7 @@ app.use(errorHandler);
 connectDB();
 
 // Start server
-app.listen(PORT,'0.0.0.0', () => {
+app.listen(PORT, '0.0.0.0', () => {
   console.log(`Server is running on http://0.0.0.0:${PORT}`);
 });
 
@@ -37,4 +38,4 @@ process.on('unhandledRejection', (err) => {
   console.error('Unhandled Promise Rejection:', err);
   // Close server & exit process
   server.close(() => process.exit(1));
-}); 
+});
