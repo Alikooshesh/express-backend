@@ -125,7 +125,13 @@ router.get('/me', requireApiKey, authenticateToken, async (req, res) => {
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
-      res.status(200).json({ email: user.email, phone: user.phone });
+      delete user.is_admin;
+      delete user.application_key;
+      delete user._id;
+      delete user.type;
+      delete user.password;
+      delete user.data_id;
+      res.status(200).json(user);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
@@ -134,6 +140,14 @@ router.get('/me', requireApiKey, authenticateToken, async (req, res) => {
 // PUT - Update user data
 router.put('/me', requireApiKey, authenticateToken, async (req, res) => {
   const updates = req.body; // Accept all fields for update
+
+  delete updates.is_admin;
+  delete updates.application_key;
+  delete updates._id;
+  delete updates.type;
+  delete updates.password;
+  delete updates.data_id;
+  
 
   try {
     const user = await User.findOne({ _id: req.userId, application_key: req.api_key });

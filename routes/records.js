@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const Record = require('../models/Record');
-const {requireApiKey} = require('../middleware/auth');
+const {requireApiKey, checkAccessLevel} = require('../middleware/auth');
+const Schema = require('../models/Schema');
 
 const formatRecord = (obj) => {
   delete obj._id;
@@ -30,9 +31,16 @@ const formatResponse = (req, res, next) => {
 router.use(formatResponse);
 
 // CREATE - Post a new record with optional category
-router.post('/:category?', requireApiKey, async (req, res) => {
+router.post('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
   try {
     const category = req.params.category || 'global'; // Default to "global"
+
+    // Check the access level for the category
+    const schema = await Schema.findOne({ application_key: req.api_key, user_custom_category: category });
+    if (schema?.access === 'user' || schema?.access === 'admin') {
+      return res.status(403).json({ message: 'Access denied for this category' });
+    }
+
     const newRecord = new Record({
       ...req.body,
       data_id: Date.now() * (Math.floor(Math.random() * 1000) + 1),
@@ -41,6 +49,7 @@ router.post('/:category?', requireApiKey, async (req, res) => {
       createdAt: new Date(),
       type: "record"
     });
+
     const savedRecord = await newRecord.save();
     res.status(201).json(savedRecord.toObject());
   } catch (error) {
@@ -49,7 +58,7 @@ router.post('/:category?', requireApiKey, async (req, res) => {
 });
 
 // READ - Get all records with sorting, filtering, pagination, and optional category
-router.get('/:category?', requireApiKey, async (req, res) => {
+router.get('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
   try {
     const category = req.params.category || 'global'; // Default to "global"
     const { 
@@ -139,7 +148,7 @@ router.get('/:category?', requireApiKey, async (req, res) => {
 });
 
 // READ - Get a single record by ID with optional category
-router.get('/:category/:id', requireApiKey, async (req, res) => {
+router.get('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) => {
   try {
     const category = req.params.category || 'global'; // Default to "global"
     const record = await Record.findOne({
@@ -159,7 +168,7 @@ router.get('/:category/:id', requireApiKey, async (req, res) => {
 });
 
 // UPDATE - Update a record by ID with optional category
-router.put('/:category/:id', requireApiKey, async (req, res) => {
+router.put('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) => {
   try {
     const category = req.params.category || 'global'; // Default to "global"
     const updatedRecord = await Record.findOneAndUpdate(
@@ -184,7 +193,7 @@ router.put('/:category/:id', requireApiKey, async (req, res) => {
 
 
 // DELETE ALL - Delete all records for a specific user with optional category
-router.delete('/:category/delete-all', requireApiKey, async (req, res) => {
+router.delete('/:category/delete-all', requireApiKey,checkAccessLevel, async (req, res) => {
     try {
       const category = req.params.category || 'global'; // Default to "global"
       const result = await Record.deleteMany({ 
@@ -209,7 +218,7 @@ router.delete('/:category/delete-all', requireApiKey, async (req, res) => {
   });
 
 // DELETE - Delete a record by ID with optional category
-router.delete('/:category/:id', requireApiKey, async (req, res) => {
+router.delete('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) => {
   try {
     const category = req.params.category || 'global'; // Default to "global"
     const deletedRecord = await Record.findOneAndDelete({

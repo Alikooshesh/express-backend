@@ -3,6 +3,7 @@ const router = express.Router();
 const Record = require('../models/Record');
 const User = require('../models/User');
 const { requireApiKey, authenticateToken } = require('../middleware/auth');
+const Schema = require('../models/Schema');
 
 // Middleware to check if user is admin
 const isAdmin = (req, res, next) => {
@@ -202,5 +203,28 @@ router.post('/data/import', requireApiKey, authenticateToken, isAdmin, async (re
   }
 });
 
+// ADMIN - CREATE a new schema document
+router.post('/schemas', requireApiKey, authenticateToken, isAdmin, async (req, res) => {
+  const { access,method,user_custom_category } = req.body;
+
+  if (!['all', 'user', 'admin'].includes(access)) {
+    return res.status(400).json({ message: 'Invalid access level. Must be "all", "user", or "admin".' });
+  }
+
+  try {
+    const newSchema = new Schema({
+      application_key: req.api_key,
+      data_id: Date.now() * (Math.floor(Math.random() * 1000) + 1),
+      method,
+      user_custom_category,
+      access,
+    });
+
+    await newSchema.save();
+    res.status(201).json({ message: 'Schema created successfully', schema: newSchema });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 module.exports = router;

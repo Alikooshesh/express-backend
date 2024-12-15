@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const Schema = require('../models/Schema');
 
 const requireApiKey = (req, res, next) => {
   const apiKey = req.header('api_key');
@@ -11,21 +12,63 @@ const requireApiKey = (req, res, next) => {
   next();
 };
 
-// New middleware to authenticate the access token
-const authenticateToken = (req, res, next) => {
+// middleware to authenticate the access token
+const authenticateToken = async (req, res, next) => {
   const token = req.header('Authorization')?.split(' ')[1]; // Assuming token is sent as "Bearer <token>"
 
   if (!token) {
     return res.status(401).json({ message: 'Access token is required' });
   }
 
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, user) => {
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
     if (err) {
       return res.status(403).json({ message: 'Invalid access token' });
     }
-    req.userId = user.id; // Store user ID for later use
+    
+    // Fetch user details from the database
+    const foundUser = await User.findById(user.id);
+    if (!foundUser) {
+      return res.status(403).json({ message: 'User not found' });
+    }
+
+    req.userId = foundUser.id; // Store user ID for later use
+    req.isAdmin = foundUser.is_admin; // Store admin status for later use
     next();
   });
 };
 
-module.exports = { requireApiKey, authenticateToken }; 
+// middleware to check if user has access to this request
+const checkAccessLevel = async (req, res, next) => {
+  const category = req.params.category || 'global';
+  const schema = await Schema.findOne({ application_key: req.api_key, user_custom_category: category, method : req.method });
+  const schemaAccessLevel = schema?.access;
+
+  if (!schemaAccessLevel || schemaAccessLevel === 'all') {
+    return next();
+  }
+
+  const token = req.header('Authorization')?.split(' ')[1];
+  if (!token) {
+    return res.status(401).json({ message: 'Access token is required' });
+  }
+
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
+    if (err) {
+      return res.status(403).json({ message: 'Invalid access token' });
+    }
+
+    const foundUser = await User.findOne({ _id: user.id, application_key: req.api_key });
+    if (!foundUser) {
+      return res.status(403).json({ message: 'Invalid access token' });
+    }
+
+    if (foundUser.is_admin || schemaAccessLevel === 'user') {
+      req.user = foundUser;
+      return next();
+    }
+
+    return res.status(403).json({ message: 'You don\'t have permission' });
+  });
+};
+
+module.exports = { requireApiKey, authenticateToken, checkAccessLevel }; 

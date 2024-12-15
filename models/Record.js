@@ -13,6 +13,11 @@ const recordSchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
+    default: 'record',
+  },
+  user_custom_category: {
+    type: String,
+    required: true,
   },
   createdAt: {
     type: Date,
