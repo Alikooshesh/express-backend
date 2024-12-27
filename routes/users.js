@@ -7,7 +7,7 @@ const bcrypt = require('bcrypt');
 
 // REGISTER - Register a new user
 router.post('/register', requireApiKey, async (req, res) => {
-  const { email, phone, password } = req.body;
+  const { email, phone, password,...rest } = req.body;
 
   if (!email && !phone) {
     return res.status(400).json({ message: 'Email or Phone is required' });
@@ -30,6 +30,7 @@ router.post('/register', requireApiKey, async (req, res) => {
       email,
       phone,
       password,
+      ...rest,
       application_key: req.api_key,
       data_id: Date.now() * (Math.floor(Math.random() * 1000) + 1),
       is_admin: false,
@@ -121,16 +122,21 @@ router.post('/token', requireApiKey, async (req, res) => {
 // GET - Fetch user data
 router.get('/me', requireApiKey, authenticateToken, async (req, res) => {
     try {
-      const user = await User.findOne({ _id: req.userId, application_key: req.api_key });
+      let user = await User.findOne({ _id: req.userId, application_key: req.api_key });
       if (!user) {
         return res.status(404).json({ message: 'User not found' });
       }
+
+      user = user.toObject();
+
       delete user.is_admin;
       delete user.application_key;
       delete user._id;
       delete user.type;
       delete user.password;
       delete user.data_id;
+      delete user.__v;
+      
       res.status(200).json(user);
     } catch (error) {
       res.status(500).json({ message: error.message });

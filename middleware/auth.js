@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const Schema = require('../models/Schema');
+const User = require('../models/User');
 
 const requireApiKey = (req, res, next) => {
   const apiKey = req.header('api_key');
@@ -19,6 +20,7 @@ const authenticateToken = async (req, res, next) => {
   if (!token) {
     return res.status(401).json({ message: 'Access token is required' });
   }
+  
 
   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, async (err, user) => {
     if (err) {
