@@ -43,7 +43,10 @@ const authenticateToken = async (req, res, next) => {
 const checkAccessLevel = async (req, res, next) => {
   const category = req.params.category || 'global';
   const schema = await Schema.findOne({ application_key: req.api_key, user_custom_category: category, method : req.method });
-  const schemaAccessLevel = schema?.access;
+  const schemaAccessLevel =  
+    !schema?.access || schema?.access === 'all' ? 
+    process.env.DEFAULT_RECORDS_ACCESS_LEVEL || schema?.access :
+    schema?.access;
 
   if (!schemaAccessLevel || schemaAccessLevel === 'all') {
     return next();
