@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {requireApiKey} = require('../middleware/auth');
+const {requireApiKey, checkAccessLevel} = require('../middleware/auth');
 const multer = require('multer');
 const path = require('path');
 const fs = require('fs');
@@ -35,7 +35,7 @@ const storage = multer.diskStorage({
   });
 
 // UPLOAD - Upload an image file
-router.post('/upload', requireApiKey, upload.single('image'), (req, res) => {
+router.post('/upload', requireApiKey,checkAccessLevel, upload.single('image'), (req, res) => {
     if (req.file) {
       const downloadLink = `/assets/uploads/${req.file.filename}`;
       res.status(201).json({ message: 'File uploaded successfully', downloadLink });
