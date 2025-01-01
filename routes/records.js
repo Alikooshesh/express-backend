@@ -68,7 +68,9 @@ router.get('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
       limit,
       filterKey,
       filterMin,
-      filterMax 
+      filterMax,
+      searchKey,
+      searchValue
     } = req.query;
 
     const filterValue = req.query.filterValue;
@@ -104,6 +106,10 @@ router.get('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
           query[filterKey] = filterValue;
         }
       }
+    }
+
+    if (searchKey && searchValue) {
+      query[searchKey] = { $regex: new RegExp(searchValue, 'i') };
     }
 
     let findQuery = Record.find(query);
