@@ -18,12 +18,13 @@ router.post('/register', requireApiKey, async (req, res) => {
 
   try {
     const existingUser = await User.findOne({
-      $or: [{ email }, { phone }],
+      phone,
+      email,
       application_key: req.api_key,
     });
 
     if (existingUser) {
-      return res.status(400).json({ message: 'Email or phone number already in use for this application' });
+      return res.status(400).json({ message: 'Email or phone number already in use for this application'});
     }
 
     const newUser = new User({
@@ -65,7 +66,8 @@ router.post('/login', requireApiKey, async (req, res) => {
 
   try {
     const user = await User.findOne({
-      $or: [{ email: email }, { phone: phone }],
+      email,
+      phone,
       application_key: req.api_key,
     });
 
