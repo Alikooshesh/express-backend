@@ -66,13 +66,13 @@ router.get('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
       order, 
       page, 
       limit,
-      filterKey,
       filterMin,
       filterMax,
       searchKey,
       searchValue
     } = req.query;
 
+    const filterKey = req.query.filterKey === 'id' ? 'data_id' : req.query.filterKey
     const filterValue = req.query.filterValue;
     
     let query = { 
