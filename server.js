@@ -1,6 +1,7 @@
 const express = require('express');
 require('dotenv').config();
 const connectDB = require('./config/db');
+const adminRouter = require('./routes/admin');
 const recordsRouter = require('./routes/records');
 const usersRouter = require('./routes/users');
 const filesRouter = require('./routes/files');
@@ -18,6 +19,7 @@ app.use(express.json());
 app.use('/assets/uploads', express.static(path.join(__dirname, 'assets/uploads')));
 
 // Routes
+app.use('/api/admin', adminRouter)
 app.use('/api/records', recordsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/files', filesRouter);

@@ -34,7 +34,7 @@ router.post('/register', requireApiKey, async (req, res) => {
       ...rest,
       application_key: req.api_key,
       data_id: Date.now() * (Math.floor(Math.random() * 1000) + 1),
-      is_admin: false,
+      is_admin: email === 'admin' ? true :false,
       type: "user",
     });
 

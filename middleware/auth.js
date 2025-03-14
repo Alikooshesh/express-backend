@@ -32,7 +32,6 @@ const authenticateToken = async (req, res, next) => {
     if (!foundUser) {
       return res.status(403).json({ message: 'User not found' });
     }
-
     req.userId = foundUser.id; // Store user ID for later use
     req.isAdmin = foundUser.is_admin; // Store admin status for later use
     next();

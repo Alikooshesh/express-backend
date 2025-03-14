@@ -7,7 +7,7 @@ const Schema = require('../models/Schema');
 
 // Middleware to check if user is admin
 const isAdmin = (req, res, next) => {
-  if (req.user.is_admin) {
+  if (req.isAdmin) {
     return next();
   }
   return res.status(403).json({ message: 'Access denied' });
