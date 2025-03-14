@@ -35,12 +35,6 @@ router.post('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
   try {
     const category = req.params.category || 'global'; // Default to "global"
 
-    // Check the access level for the category
-    const schema = await Schema.findOne({ application_key: req.api_key, user_custom_category: category });
-    if (schema?.access === 'user' || schema?.access === 'admin') {
-      return res.status(403).json({ message: 'Access denied for this category' });
-    }
-
     const newRecord = new Record({
       ...req.body,
       data_id: Date.now() * (Math.floor(Math.random() * 1000) + 1),
