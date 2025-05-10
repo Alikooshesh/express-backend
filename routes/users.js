@@ -7,10 +7,10 @@ const bcrypt = require('bcrypt');
 
 // REGISTER - Register a new user
 router.post('/register', requireApiKey, async (req, res) => {
-  const { email, phone, password,...rest } = req.body;
+  const { userName, password,...rest } = req.body;
 
-  if (!email && !phone) {
-    return res.status(400).json({ message: 'Email or Phone is required' });
+  if (!userName) {
+    return res.status(400).json({ message: 'userName is required!' });
   }
   if (!password) {
     return res.status(400).json({ message: 'Password is required' });
@@ -18,23 +18,22 @@ router.post('/register', requireApiKey, async (req, res) => {
 
   try {
     const existingUser = await User.findOne({
-      phone,
-      email,
+      userName,
       application_key: req.api_key,
     });
 
     if (existingUser) {
-      return res.status(400).json({ message: 'Email or phone number already in use for this application'});
+      return res.status(400).json({ message: 'UserName already in use for this application'});
     }
 
     const newUser = new User({
-      email,
-      phone,
+      userName,
       password,
+      profileImage : '',
       ...rest,
       application_key: req.api_key,
       data_id: Date.now() * (Math.floor(Math.random() * 1000) + 1),
-      is_admin: email === 'admin' ? true :false,
+      is_admin: userName === 'admin' ? true :false,
       type: "user",
     });
 
@@ -55,10 +54,10 @@ router.post('/register', requireApiKey, async (req, res) => {
 
 // LOGIN - Login a user
 router.post('/login', requireApiKey, async (req, res) => {
-  const { email, phone, password } = req.body;
+  const { userName, password } = req.body;
 
-  if (!email && !phone) {
-    return res.status(400).json({ message: 'Email or phone number is required' });
+  if (!userName) {
+    return res.status(400).json({ message: 'userName is required' });
   }
   if (!password) {
     return res.status(400).json({ message: 'Password is required' });
@@ -66,8 +65,7 @@ router.post('/login', requireApiKey, async (req, res) => {
 
   try {
     const user = await User.findOne({
-      email,
-      phone,
+      userName,
       application_key: req.api_key,
     });
 

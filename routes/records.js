@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const Record = require('../models/Record');
 const {requireApiKey, checkAccessLevel} = require('../middleware/auth');
-const Schema = require('../models/Schema');
 
 const formatRecord = (obj) => {
   delete obj._id;
@@ -12,6 +11,7 @@ const formatRecord = (obj) => {
   delete obj.type;
   obj.id = obj.data_id;
   delete obj.data_id;
+  delete obj.user_id;
   return obj;
 };
 
@@ -40,7 +40,9 @@ router.post('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
       data_id: Date.now() * (Math.floor(Math.random() * 1000) + 1),
       application_key: req.api_key,
       user_custom_category: category,
+      user_id : req.user?._id ?? null,
       createdAt: new Date(),
+      lastChangeAt : new Date(),
       type: "record"
     });
 
@@ -71,7 +73,8 @@ router.get('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
     
     let query = { 
       application_key: req.api_key,
-      user_custom_category: category
+      user_custom_category: category,
+      user_id : req.user_id
     };
 
     if (filterKey) {
@@ -154,7 +157,8 @@ router.get('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) =>
     const record = await Record.findOne({
       data_id: Number(req.params.id),
       application_key: req.api_key,
-      user_custom_category: category
+      user_custom_category: category,
+      user_id : req.user_id
     });
 
     if (record) {
@@ -169,15 +173,20 @@ router.get('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) =>
 
 // UPDATE - Update a record by ID with optional category
 router.put('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) => {
+  const {data_id , application_key , user_custom_category , user_id, lastChangeAt, createdAt  , ...data} = req.body
   try {
     const category = req.params.category || 'global'; // Default to "global"
     const updatedRecord = await Record.findOneAndUpdate(
       {
         data_id: Number(req.params.id),
         application_key: req.api_key,
-        user_custom_category: category
+        user_custom_category: category,
+        user_id : req.user_id
       },
-      req.body,
+      {
+        ...data,
+        lastChangeAt : new Date()
+      },
       { new: true }
     );
 
@@ -192,49 +201,49 @@ router.put('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) =>
 });
 
 
-// DELETE ALL - Delete all records for a specific user with optional category
-router.delete('/:category/delete-all', requireApiKey,checkAccessLevel, async (req, res) => {
-    try {
-      const category = req.params.category || 'global'; // Default to "global"
-      const result = await Record.deleteMany({ 
-        application_key: req.api_key,
-        user_custom_category: category
-      });
+// // DELETE ALL - Delete all records for a specific user with optional category
+// router.delete('/:category/delete-all', requireApiKey,checkAccessLevel, async (req, res) => {
+//     try {
+//       const category = req.params.category || 'global'; // Default to "global"
+//       const result = await Record.deleteMany({ 
+//         application_key: req.api_key,
+//         user_custom_category: category
+//       });
   
-      if (result.deletedCount > 0) {
-        res.json({ 
-          message: 'Records deleted successfully', 
-          deletedCount: result.deletedCount 
-        });
-      } else {
-        res.status(404).json({ 
-          message: 'No records found for this user',
-          deletedCount: 0
-        });
-      }
-    } catch (error) {
-      res.status(500).json({ message: error.message });
-    }
-  });
+//       if (result.deletedCount > 0) {
+//         res.json({ 
+//           message: 'Records deleted successfully', 
+//           deletedCount: result.deletedCount 
+//         });
+//       } else {
+//         res.status(404).json({ 
+//           message: 'No records found for this user',
+//           deletedCount: 0
+//         });
+//       }
+//     } catch (error) {
+//       res.status(500).json({ message: error.message });
+//     }
+//   });
 
-// DELETE - Delete a record by ID with optional category
-router.delete('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) => {
-  try {
-    const category = req.params.category || 'global'; // Default to "global"
-    const deletedRecord = await Record.findOneAndDelete({
-      data_id: Number(req.params.id),
-      application_key: req.api_key,
-      user_custom_category: category
-    });
+// // DELETE - Delete a record by ID with optional category
+// router.delete('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) => {
+//   try {
+//     const category = req.params.category || 'global'; // Default to "global"
+//     const deletedRecord = await Record.findOneAndDelete({
+//       data_id: Number(req.params.id),
+//       application_key: req.api_key,
+//       user_custom_category: category
+//     });
 
-    if (deletedRecord) {
-      res.json({ message: 'Record deleted successfully' });
-    } else {
-      res.status(404).json({ message: 'Record not found or unauthorized' });
-    }
-  } catch (error) {
-    res.status(500).json({ message: error.message });
-  }
-});
+//     if (deletedRecord) {
+//       res.json({ message: 'Record deleted successfully' });
+//     } else {
+//       res.status(404).json({ message: 'Record not found or unauthorized' });
+//     }
+//   } catch (error) {
+//     res.status(500).json({ message: error.message });
+//   }
+// });
 
 module.exports = router; 
