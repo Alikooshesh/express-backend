@@ -65,7 +65,8 @@ router.get('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
       filterMin,
       filterMax,
       searchKey,
-      searchValue
+      searchValue,
+      mine
     } = req.query;
 
     const filterKey = req.query.filterKey === 'id' ? 'data_id' : req.query.filterKey
@@ -74,8 +75,11 @@ router.get('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
     let query = { 
       application_key: req.api_key,
       user_custom_category: category,
-      user_id : req.user_id
     };
+
+    if(mine === 'true'){
+      query.user_id = req.user_id
+    }
 
     if (filterKey) {
       if (filterMin !== undefined || filterMax !== undefined) {
@@ -158,7 +162,6 @@ router.get('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) =>
       data_id: Number(req.params.id),
       application_key: req.api_key,
       user_custom_category: category,
-      user_id : req.user_id
     });
 
     if (record) {
