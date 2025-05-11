@@ -7,13 +7,16 @@ const bcrypt = require('bcrypt');
 
 // REGISTER - Register a new user
 router.post('/register', requireApiKey, async (req, res) => {
-  const { userName, password,...rest } = req.body;
+  const { userName, password , otp ,...rest } = req.body;
 
   if (!userName) {
     return res.status(400).json({ message: 'userName is required!' });
   }
   if (!password) {
     return res.status(400).json({ message: 'Password is required' });
+  }
+  if (otp !== 12345) {
+    return res.status(403).json({ message: 'OTP is incorrect' });
   }
 
   try {
