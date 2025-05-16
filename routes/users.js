@@ -176,4 +176,24 @@ router.put('/me', requireApiKey, authenticateToken, async (req, res) => {
   }
 });
 
+// PUT - Update user data
+router.put('/me/change-password', requireApiKey, authenticateToken, async (req, res) => {
+  const {password} = req.body; // Accept all fields for update
+  
+
+  try {
+    const user = await User.findOne({ _id: req.userId, application_key: req.api_key });
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    user.password = password
+
+    await user.save();
+    res.status(200).json({ message: 'Password updated successfully' });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router; 
