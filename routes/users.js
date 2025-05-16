@@ -180,6 +180,9 @@ router.put('/me', requireApiKey, authenticateToken, async (req, res) => {
 router.put('/me/change-password', requireApiKey, authenticateToken, async (req, res) => {
   const {password} = req.body; // Accept all fields for update
   
+  if (!password) {
+    return res.status(400).json({ message: 'Password is required' });
+  }
 
   try {
     const user = await User.findOne({ _id: req.userId, application_key: req.api_key });
