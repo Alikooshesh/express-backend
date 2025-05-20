@@ -57,8 +57,7 @@ router.post('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
         pad(now.getMinutes()) +
         pad(now.getSeconds()) +
         (Math.floor(Math.random() * 90) + 10);
-      newRecord.bl = blValue;
-      
+      newRecord.blNumber = blValue;
     }
 
     const savedRecord = await newRecord.save();
@@ -219,30 +218,30 @@ router.put('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) =>
 });
 
 
-// // DELETE ALL - Delete all records for a specific user with optional category
-// router.delete('/:category/delete-all', requireApiKey,checkAccessLevel, async (req, res) => {
-//     try {
-//       const category = req.params.category || 'global'; // Default to "global"
-//       const result = await Record.deleteMany({ 
-//         application_key: req.api_key,
-//         user_custom_category: category
-//       });
+// DELETE ALL - Delete all records for a specific user with optional category
+router.delete('/:category/delete-all', requireApiKey,checkAccessLevel, async (req, res) => {
+    try {
+      const category = req.params.category || 'global'; // Default to "global"
+      const result = await Record.deleteMany({ 
+        application_key: req.api_key,
+        user_custom_category: category
+      });
   
-//       if (result.deletedCount > 0) {
-//         res.json({ 
-//           message: 'Records deleted successfully', 
-//           deletedCount: result.deletedCount 
-//         });
-//       } else {
-//         res.status(404).json({ 
-//           message: 'No records found for this user',
-//           deletedCount: 0
-//         });
-//       }
-//     } catch (error) {
-//       res.status(500).json({ message: error.message });
-//     }
-//   });
+      if (result.deletedCount > 0) {
+        res.json({ 
+          message: 'Records deleted successfully', 
+          deletedCount: result.deletedCount 
+        });
+      } else {
+        res.status(404).json({ 
+          message: 'No records found for this user',
+          deletedCount: 0
+        });
+      }
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+  });
 
 // // DELETE - Delete a record by ID with optional category
 // router.delete('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) => {

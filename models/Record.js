@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
-const recordSchema = new mongoose.Schema({
+const recordSchema = new Schema({
   application_key: {
     type: String,
     required: true,
@@ -25,12 +26,17 @@ const recordSchema = new mongoose.Schema({
   },
   createdAt: {
     type: String,
-    default: () => new Date().toISOString()
+    default: () => new Date().toISOString(),
+    required: true,
   },
   lastChangeAt: {
     type: String,
-    default: () => new Date().toISOString()
-  }
+    default: () => new Date().toISOString(),
+    required: true,
+  },
+  blNumber: {
+    type: Schema.Types.Mixed,
+  },
 }, { 
   collection: '124',
   strict: false
