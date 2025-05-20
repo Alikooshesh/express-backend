@@ -24,8 +24,12 @@ const recordSchema = new mongoose.Schema({
     required: true,
   },
   createdAt: {
-    type: Date,
-    default: Date.now
+    type: String,
+    default: () => new Date().toISOString()
+  },
+  lastChangeAt: {
+    type: String,
+    default: () => new Date().toISOString()
   }
 }, { 
   collection: '124',

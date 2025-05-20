@@ -41,10 +41,25 @@ router.post('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
       application_key: req.api_key,
       user_custom_category: category,
       user_id : req.user?._id ?? null,
-      createdAt: new Date(),
-      lastChangeAt : new Date(),
+      createdAt: new Date().toISOString(),
+      lastChangeAt : new Date().toISOString(),
       type: "record"
     });
+
+    if(category === 'bl'){
+      const now = new Date();
+      const pad = (n) => n.toString().padStart(2, '0');
+      const blValue =
+        pad(now.getDate()) +
+        pad(now.getMonth() + 1) +
+        now.getFullYear() +
+        pad(now.getHours()) +
+        pad(now.getMinutes()) +
+        pad(now.getSeconds()) +
+        (Math.floor(Math.random() * 90) + 10);
+      newRecord.bl = blValue;
+      
+    }
 
     const savedRecord = await newRecord.save();
     res.status(201).json(savedRecord.toObject());
@@ -176,7 +191,7 @@ router.get('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) =>
 
 // UPDATE - Update a record by ID with optional category
 router.put('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) => {
-  const {data_id , application_key , user_custom_category , user_id, lastChangeAt, createdAt  , ...data} = req.body
+  const {data_id , application_key , user_custom_category , user_id, lastChangeAt, createdAt, bl  , ...data} = req.body
   try {
     const category = req.params.category || 'global'; // Default to "global"
     const updatedRecord = await Record.findOneAndUpdate(
@@ -188,7 +203,7 @@ router.put('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) =>
       },
       {
         ...data,
-        lastChangeAt : new Date()
+        lastChangeAt : new Date().toISOString,
       },
       { new: true }
     );
