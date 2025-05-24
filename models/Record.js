@@ -25,13 +25,13 @@ const recordSchema = new Schema({
     required: true,
   },
   createdAt: {
-    type: String,
-    default: () => new Date().toISOString(),
+    type: Date,
+    default: () => new Date(),
     required: true,
   },
   lastChangeAt: {
-    type: String,
-    default: () => new Date().toISOString(),
+    type: Date,
+    default: () => new Date(),
     required: true,
   },
   blNumber: {

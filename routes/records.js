@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const Record = require('../models/Record');
 const {requireApiKey, checkAccessLevel} = require('../middleware/auth');
+const { isDateString } = require('../utils/date');
 
 const formatRecord = (obj) => {
   delete obj._id;
@@ -12,6 +13,9 @@ const formatRecord = (obj) => {
   obj.id = obj.data_id;
   delete obj.data_id;
   delete obj.user_id;
+
+  obj.createdAt = obj.createdAt.toISOString();
+  obj.lastChangeAt = obj.lastChangeAt.toISOString();
   return obj;
 };
 
@@ -41,8 +45,8 @@ router.post('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
       application_key: req.api_key,
       user_custom_category: category,
       user_id : req.user?._id ?? null,
-      createdAt: new Date().toISOString(),
-      lastChangeAt : new Date().toISOString(),
+      createdAt: new Date(),
+      lastChangeAt : new Date(),
       type: "record"
     });
 
@@ -98,8 +102,13 @@ router.get('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
     if (filterKey) {
       if (filterMin !== undefined || filterMax !== undefined) {
         query[filterKey] = {};
-        if (filterMin !== undefined) query[filterKey].$gte = Number(filterMin);
-        if (filterMax !== undefined) query[filterKey].$lte = Number(filterMax);
+        if (filterMin !== undefined) {
+          query[filterKey].$gte = isDateString(filterMin) ? new Date(filterMin) : Number(filterMin);
+        }
+        if (filterMax !== undefined) {
+          query[filterKey].$lte = isDateString(filterMax) ? new Date(filterMax) : Number(filterMax);
+        }
+        console.log(query)
       }
       else if (filterValue) {
         if (Array.isArray(filterValue)) {
