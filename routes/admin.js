@@ -15,25 +15,24 @@ const isAdmin = (req, res, next) => {
 
 // ADMIN - CREATE a new user
 router.post('/users', requireApiKey, authenticateToken, isAdmin, async (req, res) => {
-  const { email, phone, password } = req.body;
+  const { userName , password } = req.body;
 
-  if (!email || !password) {
-    return res.status(400).json({ message: 'Email and Password are required' });
+  if (!userName || !password) {
+    return res.status(400).json({ message: 'userName and Password are required' });
   }
 
   try {
     const existingUser = await User.findOne({
-      $or: [{ email }, { phone }],
+      userName,
       application_key: req.api_key,
     });
 
     if (existingUser) {
-      return res.status(400).json({ message: 'Email or phone number already in use' });
+      return res.status(400).json({ message: 'userName already in use' });
     }
 
     const newUser = new User({
-      email,
-      phone,
+      userName,
       password,
       application_key: req.api_key,
       data_id: Date.now() * (Math.floor(Math.random() * 1000) + 1),
