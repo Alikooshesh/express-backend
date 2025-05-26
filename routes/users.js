@@ -148,33 +148,47 @@ router.get('/me', requireApiKey, authenticateToken, async (req, res) => {
 
 // PUT - Update user data
 router.put('/me', requireApiKey, authenticateToken, async (req, res) => {
-  const updates = req.body; // Accept all fields for update
+  const updates = { ...req.body };
 
-  delete updates.is_admin;
-  delete updates.application_key;
-  delete updates._id;
-  delete updates.type;
-  delete updates.password;
-  delete updates.data_id;
-  
+  // Remove blocked fields from the update payload
+  const blockedFields = ['is_admin', 'application_key', '_id', 'type', 'password', 'data_id'];
+  blockedFields.forEach(field => delete updates[field]);
 
   try {
-    const user = await User.findOne({ _id: req.userId, application_key: req.api_key });
-    if (!user) {
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: req.userId, application_key: req.api_key },
+      { $set: updates },
+      {
+        new: true,          // return the updated user
+        strict: false,      // allow dynamic fields outside schema
+        runValidators: false // skip schema validation
+      }
+    );
+
+    if (!updatedUser) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    // Update user fields with the provided data
-    Object.keys(updates).forEach(key => {
-      user[key] = updates[key];
-    });
+    // Optional: remove sensitive fields like password before sending
+    const userObj = updatedUser.toObject();
+    delete userObj.is_admin;
+    delete userObj.application_key;
+    delete userObj._id;
+    delete userObj.type;
+    delete userObj.password;
+    delete userObj.data_id;
+    delete userObj.__v;
 
-    await user.save();
-    res.status(200).json({ message: 'User data updated successfully' });
+    res.status(200).json({
+      message: 'User data updated successfully',
+      data: userObj
+    });
   } catch (error) {
+    console.error('Update error:', error);
     res.status(500).json({ message: error.message });
   }
 });
+
 
 // PUT - Update user data
 router.put('/me/change-password', requireApiKey, authenticateToken, async (req, res) => {

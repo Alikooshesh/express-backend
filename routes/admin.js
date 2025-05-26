@@ -62,21 +62,29 @@ router.put('/users/:id', requireApiKey, authenticateToken, isAdmin, async (req, 
   const updates = req.body;
 
   try {
-    const user = await User.findOne({ _id: req.params.id, application_key: req.api_key });
-    if (!user) {
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: req.params.id, application_key: req.api_key },
+      { $set: updates },
+      {
+        new: true,          // return the updated document
+        strict: false,      // allow fields not in schema
+        runValidators: false // skip schema validation if needed
+      }
+    );
+
+    if (!updatedUser) {
       return res.status(404).json({ message: 'User not found' });
     }
 
-    Object.keys(updates).forEach(key => {
-      user[key] = updates[key];
+    res.status(200).json({
+      message: 'User updated successfully',
+      data: updatedUser
     });
-
-    await user.save();
-    res.status(200).json({ message: 'User data updated successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
+
 
 // ADMIN - DELETE a user
 router.delete('/users/:id', requireApiKey, authenticateToken, isAdmin, async (req, res) => {
