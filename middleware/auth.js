@@ -47,11 +47,15 @@ const checkAccessLevel = async (req, res, next) => {
     process.env.DEFAULT_RECORDS_ACCESS_LEVEL || schema?.access :
     schema?.access;
 
+  const token = req.header('Authorization')?.split(' ')[1];
+
   if (!schemaAccessLevel || schemaAccessLevel === 'all') {
-    return next();
+    if(!token){
+      return next();
+    }
   }
 
-  const token = req.header('Authorization')?.split(' ')[1];
+  
   if (!token) {
     return res.status(401).json({ message: 'Access token is required' });
   }

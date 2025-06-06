@@ -96,7 +96,7 @@ router.get('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
     };
 
     if(mine === 'true'){
-      query.user_id = req.user_id
+      query.user_id = req.user._id.toString()
     }
 
     if (filterKey) {
