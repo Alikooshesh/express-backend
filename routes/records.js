@@ -108,7 +108,6 @@ router.get('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
         if (filterMax !== undefined) {
           query[filterKey].$lte = isDateString(filterMax) ? new Date(filterMax) : Number(filterMax);
         }
-        console.log(query)
       }
       else if (filterValue) {
         if (Array.isArray(filterValue)) {
@@ -152,7 +151,7 @@ router.get('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
       findQuery,
       Record.countDocuments(query)
     ]);
-
+    
     res.json({
       records: records.map(r => r.toObject()),
       totalRecords: total,
