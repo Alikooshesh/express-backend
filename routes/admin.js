@@ -15,7 +15,7 @@ const isAdmin = (req, res, next) => {
 
 // ADMIN - CREATE a new user
 router.post('/users', requireApiKey, authenticateToken, isAdmin, async (req, res) => {
-  const { userName , password } = req.body;
+  const { userName , password,application_key,data_id,is_admin,type, ...rest } = req.body;
 
   if (!userName || !password) {
     return res.status(400).json({ message: 'userName and Password are required' });
@@ -38,6 +38,7 @@ router.post('/users', requireApiKey, authenticateToken, isAdmin, async (req, res
       data_id: Date.now() * (Math.floor(Math.random() * 1000) + 1),
       is_admin: false,
       type: "user",
+      ...rest
     });
 
     await newUser.save();
