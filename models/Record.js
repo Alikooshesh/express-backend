@@ -37,6 +37,72 @@ const recordSchema = new Schema({
   blNumber: {
     type: Schema.Types.Mixed,
   },
+  BOLDate: {
+    type: Date,
+    default: () => new Date(),
+  },
+  shipDate: {
+    type: Date,
+    default: () => new Date(),
+  },
+  receiveDate: {
+    type: Date,
+    default: () => new Date(),
+  },
+  vesselName: {
+    type: String,
+  },
+  vesselNo: {
+    type: String,
+  },
+  vesselType: {
+    type: String,
+  },
+  trackingURL: {
+    type: String,
+  },
+  shipper: {
+    type: String,
+  },
+  shipperAddr: {
+    type: String,
+  },
+  consignee: {
+    type: String,
+  },
+  consigneeAddr: {
+    type: String,
+  },
+  origin: {
+    type: String,
+  },
+  destination: {
+    type: String,
+  },
+  category: {
+    type: String,
+  },
+  productName: {
+    type: String,
+  },
+  unit: {
+    type: String,
+  },
+  cargoDesc: {
+    type: String,
+  },
+  stampUrl: {
+    type: String,
+  },
+  signatureUrl: {
+    type: String,
+  },
+  grossWidth: {
+    type: Number,
+  },
+  quantity: {
+    type: Number,
+  },
 }, { 
   collection: '124',
   strict: false
