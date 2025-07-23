@@ -59,7 +59,7 @@ router.get('/users', requireApiKey, authenticateToken, isAdmin, async (req, res)
 });
 
 // ADMIN - READ a user
-router.put('/users/:id', requireApiKey, authenticateToken, isAdmin, async (req, res) => {
+router.get('/users/:id', requireApiKey, authenticateToken, isAdmin, async (req, res) => {
   const updates = req.body;
 
   try {
