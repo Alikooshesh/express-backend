@@ -58,6 +58,25 @@ router.get('/users', requireApiKey, authenticateToken, isAdmin, async (req, res)
   }
 });
 
+// ADMIN - READ a user
+router.put('/users/:id', requireApiKey, authenticateToken, isAdmin, async (req, res) => {
+  const updates = req.body;
+
+  try {
+    const user = await User.find(
+      { _id: req.params.id, application_key: req.api_key }
+    );
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 // ADMIN - UPDATE a user
 router.put('/users/:id', requireApiKey, authenticateToken, isAdmin, async (req, res) => {
   const updates = req.body;
