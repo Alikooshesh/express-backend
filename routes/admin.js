@@ -60,7 +60,6 @@ router.get('/users', requireApiKey, authenticateToken, isAdmin, async (req, res)
 
 // ADMIN - READ a user
 router.get('/users/:id', requireApiKey, authenticateToken, isAdmin, async (req, res) => {
-  const updates = req.body;
 
   try {
     const user = await User.findOne(
