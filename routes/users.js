@@ -88,7 +88,13 @@ router.post('/login', requireApiKey, async (req, res) => {
     user.refreshToken = refreshToken;
     await user.save();
 
-    res.status(200).json({ accessToken, refreshToken });
+    const finalResponse = { accessToken, refreshToken  }
+
+    if(user.is_admin){
+      finalResponse.is_admin = true;
+    }
+
+    res.status(200).json(finalResponse);
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -132,7 +138,10 @@ router.get('/me', requireApiKey, authenticateToken, async (req, res) => {
 
       user = user.toObject();
 
-      delete user.is_admin;
+      if(!user.is_admin){
+        delete user.is_admin;
+      }
+      
       delete user.application_key;
       delete user._id;
       delete user.type;
