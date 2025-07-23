@@ -63,7 +63,7 @@ router.get('/users/:id', requireApiKey, authenticateToken, isAdmin, async (req, 
   const updates = req.body;
 
   try {
-    const user = await User.find(
+    const user = await User.findOne(
       { _id: req.params.id, application_key: req.api_key }
     );
 
