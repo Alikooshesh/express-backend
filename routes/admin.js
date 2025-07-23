@@ -80,6 +80,10 @@ router.get('/users/:id', requireApiKey, authenticateToken, isAdmin, async (req, 
 router.put('/users/:id', requireApiKey, authenticateToken, isAdmin, async (req, res) => {
   const updates = req.body;
 
+  if(!updates.password){
+    delete updates.password
+  }
+
   try {
     const updatedUser = await User.findOneAndUpdate(
       { _id: req.params.id, application_key: req.api_key },
