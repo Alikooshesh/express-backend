@@ -160,7 +160,7 @@ router.put('/me', requireApiKey, authenticateToken, async (req, res) => {
   const updates = { ...req.body };
 
   // Remove blocked fields from the update payload
-  const blockedFields = ['is_admin', 'application_key', '_id', 'type', 'password', 'data_id'];
+  const blockedFields = ['is_admin', 'application_key', '_id', 'type', 'data_id'];
   blockedFields.forEach(field => delete updates[field]);
 
   try {
