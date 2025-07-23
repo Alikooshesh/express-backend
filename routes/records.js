@@ -210,7 +210,7 @@ router.put('/:category/:id', requireApiKey,checkAccessLevel, async (req, res) =>
       },
       {
         ...data,
-        lastChangeAt : new Date().toISOString,
+        lastChangeAt : new Date(),
       },
       { new: true }
     );
