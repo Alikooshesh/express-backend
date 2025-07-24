@@ -70,6 +70,8 @@ const checkAccessLevel = async (req, res, next) => {
       return res.status(403).json({ message: 'Invalid access token' });
     }
 
+    req.user_id = foundUser._id
+
     if (foundUser.is_admin || schemaAccessLevel === 'user') {
       req.user = foundUser;
       return next();
