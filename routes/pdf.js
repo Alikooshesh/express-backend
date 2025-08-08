@@ -192,7 +192,10 @@ router.get("/bl/:api_key/:id", async (req, res) => {
 
     const htmlContent = generateHtmlTable(data);
 
-    const browser = await puppeteer.launch();
+    const browser = await puppeteer.launch({
+      headless: true, // or false if you want to see the browser
+      args: ['--no-sandbox', '--disable-setuid-sandbox']
+    });
     const page = await browser.newPage();
     await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
