@@ -5,6 +5,7 @@ const adminRouter = require('./routes/admin');
 const recordsRouter = require('./routes/records');
 const usersRouter = require('./routes/users');
 const filesRouter = require('./routes/files');
+const pdfRouter = require('./routes/pdf');
 const errorHandler = require('./middleware/errorHandler');
 const path = require('path');
 const cors = require('cors');
@@ -23,6 +24,7 @@ app.use('/api/admin', adminRouter)
 app.use('/api/records', recordsRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/files', filesRouter);
+app.use('/api/pdf', pdfRouter);
 
 // Error handling middleware (must be after routes)
 app.use(errorHandler);
