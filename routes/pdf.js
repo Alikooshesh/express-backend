@@ -1,19 +1,19 @@
 const express = require("express");
 const router = express.Router();
 const puppeteer = require("puppeteer");
-const fs = require('fs');
-const path = require('path');
+const fs = require("fs");
+const path = require("path");
 const Record = require("../models/Record");
 
 function getImageBase64Url(filePath) {
-  if (!filePath) return '';
+  if (!filePath) return "";
   try {
     const absPath = path.join(process.cwd(), filePath);
-    if (!fs.existsSync(absPath)) return '';
-    const data = fs.readFileSync(absPath).toString('base64');
+    if (!fs.existsSync(absPath)) return "";
+    const data = fs.readFileSync(absPath).toString("base64");
     return `data:image/png;base64,${data}`;
   } catch (e) {
-    return '';
+    return "";
   }
 }
 
@@ -85,7 +85,7 @@ function generateHtmlTable(data) {
       <td class="pr-8 w-45" valign="bottom">
         <div class="border p-8 bg-gray">
           <span class="pr-8">Bill of Lading no .</span>
-          <span class="font-bold">${data.blNo}</span>
+          <span class="font-bold">${data.blNumber}</span>
         </div>
 
         <!-- Shipper -->
@@ -114,7 +114,7 @@ function generateHtmlTable(data) {
             <th class="border font-500 p-8 text-left">Notify Party (Complete name and Address)</th>
           </tr>
           <tr class="border">
-            <td class="border p-8">${data.notify}</td>
+            <td class="border p-8">${data.notify ?? data.consignee}</td>
           </tr>
         </table>
       </td>
@@ -135,7 +135,7 @@ function generateHtmlTable(data) {
                   <th class="border font-500 p-8 text-left">Place of Receipt:</th>
                 </tr>
                 <tr class="border">
-                  <td class="border p-8 font-700">${data.placeOfReceipt}</td>
+                  <td class="border p-8 font-700">${data.origin}</td>
                 </tr>
               </table>
 
@@ -145,7 +145,7 @@ function generateHtmlTable(data) {
                   <th class="border font-500 p-8 text-left">Place of Delivery:</th>
                 </tr>
                 <tr class="border">
-                  <td class="border p-8 font-700">${data.placeOfDelivery}</td>
+                  <td class="border p-8 font-700">${data.destination}</td>
                 </tr>
               </table>
 
@@ -155,7 +155,9 @@ function generateHtmlTable(data) {
                   <th class="border font-500 p-8 text-left">Vessel/Voyage no :</th>
                 </tr>
                 <tr class="border">
-                  <td class="border p-8 font-700">${data.occeanVessel}</td>
+                  <td class="border p-8 font-700">${data.vesselName} - ${
+    data.vesselNumber
+  }</td>
                 </tr>
               </table>
             </td>
@@ -167,7 +169,7 @@ function generateHtmlTable(data) {
                   <th class="border font-500 p-8 text-left">Port of Receipt:</th>
                 </tr>
                 <tr class="border">
-                  <td class="border p-8 font-700">${data.portOfReceipt}</td>
+                  <td class="border p-8 font-700">${data.origin}</td>
                 </tr>
               </table>
 
@@ -177,7 +179,7 @@ function generateHtmlTable(data) {
                   <th class="border font-500 p-8 text-left">Port of Discharge:</th>
                 </tr>
                 <tr class="border">
-                  <td class="border p-8 font-700">${data.portOfDischarge}</td>
+                  <td class="border p-8 font-700">${data.destination}</td>
                 </tr>
               </table>
 
@@ -187,7 +189,7 @@ function generateHtmlTable(data) {
                   <th class="border font-500 p-8 text-left">Invoice number:</th>
                 </tr>
                 <tr class="border">
-                  <td class="border p-8 font-700">${data.invoiceNo}</td>
+                  <td class="border p-8 font-700">${data.invoiceNo ?? "-"}</td>
                 </tr>
               </table>
             </td>
@@ -206,14 +208,20 @@ function generateHtmlTable(data) {
       <th class="border font-500 p-8">Gross weight</th>
       <th class="border font-500 p-8">Measurement</th>
     </tr>
-    ${data.goods.map(item => `
+    ${data.products
+      .map(
+        (item) => `
     <tr class="border h-50 text-center">
       <td class="border p-8">${item.containerNo || ""}</td>
-      <td class="border p-8"><p class="font-600 mt-10 text-gray">${item.productName}</p></td>
-      <td class="border p-8">${item.pkgs || ""}</td>
+      <td class="border p-8"><p class="font-600 mt-10 text-gray">${
+        item.productName
+      } <br> ${item.description}</p></td>
+      <td class="border p-8">${item.productQuantity || ""}</td>
       <td class="border p-8">${item.weight || ""} ${item.unit || ""}</td>
       <td class="border p-8">${item.measurement || ""}</td>
-    </tr>`).join("")}
+    </tr>`
+      )
+      .join("")}
     <tr class="border">
       <td class="text-center font-700 border">Total</td>
       <td></td>
@@ -229,8 +237,8 @@ function generateHtmlTable(data) {
       <th class="font-700 text-left px-12 border">Shipped in Board</th>
     </tr>
     <tr>
-      <td class="font-700 text-gray px-12 border">${data.freightPayableAt}</td>
-      <td class="font-700 text-gray px-12 border">${data.placeOfIssue}</td>
+      <td class="font-700 text-gray px-12 border">${data.destination}</td>
+      <td class="font-700 text-gray px-12 border">${data.origin}</td>
       <td class="font-700 text-gray px-12 border">${data.dateOfIssue}</td>
       <td class="font-700 text-gray px-12 border">${data.shippedOnBoard}</td>
     </tr>
@@ -259,8 +267,16 @@ function generateHtmlTable(data) {
           </tr>
           <tr class="border">
             <td class="border p-8 h-280 text-center">
-              <img src="${data.signatureUrl}" style="max-height:80px; transform: scale(${data.signScale});"/><br/>
-              <img src="${data.stampUrl}" style="max-height:80px; transform: rotate(${data.stampAngle}deg);"/>
+              <img src="${
+                data.signatureUrl
+              }" style="max-height:80px; transform: scale(${
+    data.signScale
+  });"/><br/>
+              <img src="${
+                data.stampUrl
+              }" style="max-height:80px; transform: rotate(${
+    data.stampAngle
+  }deg);"/>
             </td>
           </tr>
         </table>
@@ -305,60 +321,60 @@ router.get("/bl/:api_key/:id", async (req, res) => {
 
     if (record) {
       const bl = record.toObject();
-
       // For demo, use hardcoded data. Replace with req.body or req.query as needed.
-    const logoPath = path.join(__dirname, '../assets/logo/logo.png');
-    const logoData = fs.readFileSync(logoPath).toString('base64');
-    const logoUrl = `data:image/png;base64,${logoData}`;
+      const logoPath = path.join(__dirname, "../assets/logo/logo.png");
+      const logoData = fs.readFileSync(logoPath).toString("base64");
+      const logoUrl = `data:image/png;base64,${logoData}`;
 
-    const signatureUrl = getImageBase64Url(bl.signature);
-    const stampUrl = getImageBase64Url(bl.stamp);
+      const signatureUrl = getImageBase64Url(bl.signature);
+      const stampUrl = getImageBase64Url(bl.stamp);
 
-    const data = {
-      consignor: `
+      const data = {
+        ...bl,
+        consignor: `
         ${bl.shipper}\n
         ${bl.shipperAddress}
       `,
-      consignee: `
+        consignee: `
         ${bl.consignee}\n
         ${bl.consigneeAddress}
       `,
-      occeanVessel: bl.vesselName,
-      portOfLoading: bl.origin,
-      portOfDischarge: bl.destination,
-      placeOfDelivery: bl.destination,
-      logoUrl: logoUrl,
-      goods: bl.products.map(item => `${item.weight} ${item.unit} ${item.productName}`),
-      shippedOnBoard: bl.shipmentDate,
-      dateOfIssue: bl.registerDate,
-      signatureUrl: signatureUrl,
-      stampUrl: stampUrl,
-      signScale : bl.signScale ?? 1,
-      stampAngle : bl.stampAngle ?? 0,
-    };
+        occeanVessel: bl.vesselName,
+        portOfLoading: bl.origin,
+        portOfDischarge: bl.destination,
+        placeOfDelivery: bl.destination,
+        logoUrl: logoUrl,
+        goods: bl.products.map(
+          (item) => `${item.weight} ${item.unit} ${item.productName}`
+        ),
+        shippedOnBoard: bl.shipmentDate,
+        dateOfIssue: bl.registerDate,
+        signatureUrl: signatureUrl,
+        stampUrl: stampUrl,
+        signScale: bl.signScale ?? 1,
+        stampAngle: bl.stampAngle ?? 0,
+      };
 
-    const htmlContent = generateHtmlTable(data);
+      const htmlContent = generateHtmlTable(data);
 
-    const browser = await puppeteer.launch({
-      headless: true, // or false if you want to see the browser
-      args: ['--no-sandbox', '--disable-setuid-sandbox']
-    });
-    const page = await browser.newPage();
-    await page.setContent(htmlContent, { waitUntil: "networkidle0" });
+      const browser = await puppeteer.launch({
+        headless: true, // or false if you want to see the browser
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      });
+      const page = await browser.newPage();
+      await page.setContent(htmlContent, { waitUntil: "networkidle0" });
 
-    const pdfBuffer = await page.pdf({ format: "A4" });
+      const pdfBuffer = await page.pdf({ format: "A4" });
 
-    await browser.close();
+      await browser.close();
 
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", 'inline; filename="sample.pdf"');
-    res.setHeader("Content-Length", pdfBuffer.length);
-    res.end(pdfBuffer);
-
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", 'inline; filename="sample.pdf"');
+      res.setHeader("Content-Length", pdfBuffer.length);
+      res.end(pdfBuffer);
     } else {
       res.status(404).json({ message: "Record not found or unauthorized" });
     }
-
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: error.message });
