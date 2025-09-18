@@ -159,6 +159,12 @@ router.get('/me', requireApiKey, authenticateToken, async (req, res) => {
 router.put('/me', requireApiKey, authenticateToken, async (req, res) => {
   const updates = { ...req.body };
 
+  if (!updates.password){
+    delete updates.password
+  }else{
+    updates.password = await bcrypt.hash(updates.password, 10);
+  }
+
   // Remove blocked fields from the update payload
   const blockedFields = ['is_admin', 'application_key', '_id', 'type', 'data_id'];
   blockedFields.forEach(field => delete updates[field]);
