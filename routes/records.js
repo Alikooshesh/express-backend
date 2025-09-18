@@ -61,6 +61,11 @@ router.post('/:category?', requireApiKey,checkAccessLevel, async (req, res) => {
         pad(now.getMinutes()) +
         pad(now.getSeconds()) +
         (Math.floor(Math.random() * 90) + 10);
+      const signScale = (Math.random() * 1.0 + 0.5).toFixed(2); // 0.5 to 1.5
+      const stampAngle = (Math.random() * 60 - 30).toFixed(2);  // -30 to +30 degrees
+
+      newRecord.signScale = signScale;
+      newRecord.stampAngle = stampAngle;
       newRecord.blNumber = blValue;
     }
 

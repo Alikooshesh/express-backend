@@ -103,6 +103,12 @@ const recordSchema = new Schema({
   quantity: {
     type: Number,
   },
+  signScale: {
+    type: Number,
+  },
+  stampAngle: {
+    type: Number,
+  },
 }, { 
   collection: '124',
   strict: false
