@@ -210,9 +210,9 @@ function generateHtmlTable(data) {
     </tr>
     ${data.products
       .map(
-        (item) => `
+        (item,index) => `
     <tr class="border h-50 text-center">
-      <td class="border p-8">${item.containerNo || ""}</td>
+      <td class="border p-8">${index+1}</td>
       <td class="border p-8"><p class="font-600 mt-10 text-gray">${
         item.productName
       } <br> ${item.description}</p></td>
